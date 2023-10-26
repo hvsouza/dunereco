@@ -13,6 +13,8 @@
 #include <iostream>
 //ROOT
 #include "Math/GenVector/LorentzVector.h" 
+#include "TFile.h"
+#include "TTree.h"
 //ART
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h" 
@@ -31,6 +33,9 @@ namespace dune
 class NeutrinoEnergyRecoAlg 
 {
     public:
+
+
+        ~NeutrinoEnergyRecoAlg();
         /**
         * @brief  Constructor
         *
@@ -98,6 +103,11 @@ class NeutrinoEnergyRecoAlg
 
     private:
 
+        TFile *fFile{nullptr};
+        TTree *fTree{nullptr};
+        double fLepE{0};
+        int fsubrun{0};
+        int fevent{0};
         typedef Position4_t Momentum4_t;
 
         double kMuonMass = 0.1056583745;                          ///< the muon mass (hardcoded unfortunately)
@@ -293,6 +303,15 @@ class NeutrinoEnergyRecoAlg
         double fIntNuEHadEn;                                     ///< the hadronic energy correction intercept for nue
         double fDistanceToWallThreshold;                         ///< the min distance from a detector wall to be considered contained
         double fMuonRangeToMCSThreshold;                         ///< the ratio threshold at which MCS is used for contained muons
+
+        std::string fMCSMethod;                                  ///< Method os MCS, Chi2 or Log Likelihood (LLHD)
+        double fMinTrackLengthMCS;                               ///< the minimum track length in cm to compute MCS
+        double fMaxTrackLengthMCS;                               ///< the maximum track length in cm to compute MCS
+        double fSegmentSizeMCS;                                  ///< the segment length in cm to compute scattered angle MCS
+        int fMaxMomentumMCS;                                     ///< the maximum momentum to be fitted
+        int fStepsMomentumMCS;                                   ///< for LLHD, energy steps to minimize
+        int fMaxResolutionMCS;                                   ///< for LLHD, angle resolution is fitted, set 0 to keep at 2 mrad
+        bool fOnlyValidPointsMCS;                                   ///< for MCS, rather to only only track valid points or not
         double fRecombFactor;                                    ///< the average reccombination factor
 
         std::string fTrackLabel;                                 ///< the track label
