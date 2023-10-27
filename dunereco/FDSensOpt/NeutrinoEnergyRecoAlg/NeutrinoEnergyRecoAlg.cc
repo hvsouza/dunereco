@@ -74,8 +74,8 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
     fTree->Branch("event", &fevent);
     fTree->Branch("azx", &bazx);
     fTree->Branch("azy", &bazy);
-    fTree->Branch("ei", &bei);
-    fTree->Branch("ej", &bej);
+    fTree->Branch("acomp", &bei);
+    fTree->Branch("seg", &bej);
     fTree->Branch("p", &fLepE);
     fTree->Branch("len", &blen);
 
@@ -351,12 +351,12 @@ double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByMCS(const art::P
     if (fMCSMethod == "Chi2")
     {
         std::cout << "reschi2: ";
-        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS));
+        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fTree));
     }
     else if (fMCSMethod == "LLHD")
     {
         std::cout << "resllhd: ";
-        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS, fTree));
+        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS));
     }
     else
     {
