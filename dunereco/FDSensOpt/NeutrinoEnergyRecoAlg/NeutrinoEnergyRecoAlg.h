@@ -13,8 +13,6 @@
 #include <iostream>
 //ROOT
 #include "Math/GenVector/LorentzVector.h" 
-#include "TFile.h"
-#include "TTree.h"
 //ART
 #include "art/Framework/Principal/Event.h"
 #include "fhiclcpp/ParameterSet.h" 
@@ -33,9 +31,6 @@ namespace dune
 class NeutrinoEnergyRecoAlg 
 {
     public:
-
-
-        ~NeutrinoEnergyRecoAlg();
         /**
         * @brief  Constructor
         *
@@ -103,11 +98,6 @@ class NeutrinoEnergyRecoAlg
 
     private:
 
-        TFile *fFile{nullptr};
-        TTree *fTree{nullptr};
-        double fLepE{0};
-        int fsubrun{0};
-        int fevent{0};
         typedef Position4_t Momentum4_t;
 
         double kMuonMass = 0.1056583745;                          ///< the muon mass (hardcoded unfortunately)
