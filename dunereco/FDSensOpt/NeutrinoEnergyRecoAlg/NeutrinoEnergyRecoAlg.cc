@@ -69,13 +69,16 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
 {
     fFile = new TFile("mcs_dump.root", "RECREATE");
     fTree = new TTree("t1","t1");
-    double bazx, bazy, bei, bej, blen;
+    double bazx, bazy, bacomp, erbazx, erbazy, erbacomp, bseg, blen;
     fTree->Branch("subrun", &fsubrun);
     fTree->Branch("event", &fevent);
     fTree->Branch("azx", &bazx);
     fTree->Branch("azy", &bazy);
-    fTree->Branch("acomp", &bei);
-    fTree->Branch("seg", &bej);
+    fTree->Branch("acomp", &bacomp);
+    fTree->Branch("erazx", &erbazx);
+    fTree->Branch("erazy", &erbazy);
+    fTree->Branch("eracomp", &erbacomp);
+    fTree->Branch("seg", &bseg);
     fTree->Branch("p", &fLepE);
     fTree->Branch("len", &blen);
 
