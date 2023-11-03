@@ -241,8 +241,10 @@ dune::EnergyRecoOutput NeutrinoEnergyRecoAlg::CalculateNeutrinoEnergyViaMuonMCS(
     auto truth = (*gt)[0];
     fsubrun = event.id().subRun();
     fevent = event.id().event();
-    fLepE = truth.GetNeutrino().Lepton().Momentum().T();
-    // fLepE = truth.GetParticle(0).Momentum().T();
+    if (truth.NeutrinoSet())
+        fLepE = truth.GetNeutrino().Lepton().Momentum().T();
+    else
+        fLepE = truth.GetParticle(0).Momentum().T();
     const double muonMomentumMCS(this->CalculateMuonMomentumByMCS(pMuonTrack));
 
     if (muonMomentumMCS > std::numeric_limits<double>::epsilon())
