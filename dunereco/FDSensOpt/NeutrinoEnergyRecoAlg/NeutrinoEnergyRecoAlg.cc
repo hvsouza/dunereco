@@ -69,7 +69,7 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
 {
     fFile = new TFile("mcs_dump.root", "RECREATE");
     fTree = new TTree("t1","t1");
-    double bazx, bazy, bacomp, erbazx, erbazy, erbacomp, bseg, blen;
+    double bazx, bazy, bacomp, erbazx, erbazy, erbacomp, bseg, blen, brecoL;
     fTree->Branch("subrun", &fsubrun);
     fTree->Branch("event", &fevent);
     fTree->Branch("azx", &bazx);
@@ -81,6 +81,7 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
     fTree->Branch("seg", &bseg);
     fTree->Branch("p", &fLepE);
     fTree->Branch("len", &blen);
+    fTree->Branch("recolen", &brecoL);
 
 }
 
@@ -356,12 +357,10 @@ double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByMCS(const art::P
     trkf::TrackMomentumCalculator TrackMomCalc(fMinTrackLengthMCS,fMaxTrackLengthMCS, fSegmentSizeMCS);
     if (fMCSMethod == "Chi2")
     {
-        std::cout << "reschi2: ";
         return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fTree));
     }
     else if (fMCSMethod == "LLHD")
     {
-        std::cout << "resllhd: ";
         return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS));
     }
     else

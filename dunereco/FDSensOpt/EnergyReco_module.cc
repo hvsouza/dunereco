@@ -109,7 +109,7 @@ void EnergyReco::produce(art::Event& evt)
             energyRecoOutput = std::make_unique<dune::EnergyRecoOutput>(fNeutrinoEnergyRecoAlg.CalculateNeutrinoEnergyViaMuonRanging(longestTrack, evt));
         else if (fLongestTrackMethod == 2)
         {
-            std::cout << "fitR: " << evt.subRun() << " " << evt.id().event() << " ";
+            // std::cout << "fitR: " << evt.subRun() << " " << evt.id().event() << " ";
             energyRecoOutput = std::make_unique<dune::EnergyRecoOutput>(fNeutrinoEnergyRecoAlg.CalculateNeutrinoEnergyViaMuonMCS(longestTrack, evt));
         }
     }
