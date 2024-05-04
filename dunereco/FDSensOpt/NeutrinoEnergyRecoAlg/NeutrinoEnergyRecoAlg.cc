@@ -25,6 +25,8 @@
 #include "dunereco/AnaUtils/DUNEAnaHitUtils.h"
 #include "dunereco/AnaUtils/DUNEAnaShowerUtils.h"
 #include "dunereco/AnaUtils/DUNEAnaTrackUtils.h"
+#include "TFile.h"
+#include "TTree.h"
 
 #include "dunereco/FDSensOpt/NeutrinoEnergyRecoAlg/NeutrinoEnergyRecoAlg.h"
 
@@ -64,8 +66,24 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
     fShowerToHitLabel(showerToHitLabel),
     fHitToSpacePointLabel(hitToSpacePointLabel)
 {
+    fFile = new TFile("mcs_dump.root", "RECREATE");
+    fTree = new TTree("t1","t1");
+    double bazx, bazy, bei, bej, blen;
+    fTree->Branch("subrun", &fsubrun);
+    fTree->Branch("event", &fevent);
+    fTree->Branch("azx", &bazx);
+    fTree->Branch("azy", &bazy);
+    fTree->Branch("ei", &bei);
+    fTree->Branch("ej", &bej);
+    fTree->Branch("p", &fLepE);
+    fTree->Branch("len", &blen);
+
 }
 
+NeutrinoEnergyRecoAlg::~NeutrinoEnergyRecoAlg(){
+    fFile->WriteObject(fTree, "t1", "TObject::kOverwrite");
+    fFile->Close();
+}
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 dune::EnergyRecoOutput NeutrinoEnergyRecoAlg::CalculateNeutrinoEnergy(const art::Ptr<recob::Track> &pMuonTrack, const art::Event &event)
@@ -217,6 +235,15 @@ dune::EnergyRecoOutput NeutrinoEnergyRecoAlg::CalculateNeutrinoEnergyViaMuonMCS(
 
     const std::vector<art::Ptr<recob::Hit> > muonHits(dune_ana::DUNEAnaHitUtils::GetHitsOnPlane(dune_ana::DUNEAnaTrackUtils::GetHits(pMuonTrack, event, fTrackToHitLabel),2));
     bool isContained(this->IsContained(muonHits, event));
+
+    auto gt = event.getHandle< std::vector<simb::MCTruth> >("generator");
+    auto truth = (*gt)[0];
+    fsubrun = event.id().subRun();
+    fevent = event.id().event();
+    if (truth.NeutrinoSet())
+        fLepE = truth.GetNeutrino().Lepton().Momentum().T();
+    else
+        fLepE = truth.GetParticle(0).Momentum().T();
     const double muonMomentumMCS(this->CalculateMuonMomentumByMCS(pMuonTrack));
 
     if (muonMomentumMCS > std::numeric_limits<double>::epsilon())
@@ -228,7 +255,10 @@ dune::EnergyRecoOutput NeutrinoEnergyRecoAlg::CalculateNeutrinoEnergyViaMuonMCS(
         return this->CalculateNeutrinoEnergy(muonHits, event, energyRecoInputHolder);
     }
     else 
+    {
+        std::cout << "\n";
         return this->CalculateNeutrinoEnergy(event);
+    }
 
 
 }
@@ -321,9 +351,15 @@ double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByMCS(const art::P
 {
     trkf::TrackMomentumCalculator TrackMomCalc(fMinTrackLengthMCS,fMaxTrackLengthMCS, fSegmentSizeMCS);
     if (fMCSMethod == "Chi2")
-        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, true, fMaxMomentumMCS));
+    {
+        std::cout << "reschi2: ";
+        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS));
+    }
     else if (fMCSMethod == "LLHD")
-        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, true, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS));
+    {
+        std::cout << "resllhd: ";
+        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS, fTree));
+    }
     else
     {
         mf::LogWarning("NeutrinoEnergyRecoAlg") << " Method " << fMCSMethod << " not found. Use `Chi2` or `LLHD` for MCS. Using `Chi2` for now." << std::endl;
