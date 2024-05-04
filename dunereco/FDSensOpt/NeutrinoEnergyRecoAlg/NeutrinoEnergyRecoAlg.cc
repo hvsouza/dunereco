@@ -353,12 +353,12 @@ double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByMCS(const art::P
     if (fMCSMethod == "Chi2")
     {
         std::cout << "reschi2: ";
-        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS));
+        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, true, fMaxMomentumMCS));
     }
     else if (fMCSMethod == "LLHD")
     {
         std::cout << "resllhd: ";
-        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, fOnlyValidPointsMCS, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS, fTree));
+        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, true, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS, fTree));
     }
     else
     {
