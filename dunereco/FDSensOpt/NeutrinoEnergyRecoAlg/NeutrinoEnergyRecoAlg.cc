@@ -54,9 +54,13 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
     fMinTrackLengthMCS(pset.get<double>("MinTrackLengthMCS")),
     fMaxTrackLengthMCS(pset.get<double>("MaxTrackLengthMCS")),
     fSegmentSizeMCS(pset.get<double>("SegmentSizeMCS")),
+    fNStepsChi2(pset.get<double>("NStepsChi2")),
     fMaxMomentumMCS(pset.get<int>("MaxMomentumMCS")),
-    fStepsMomentumMCS(pset.get<int>("StepsMomentumMCS")),
-    fMaxResolutionMCS(pset.get<int>("MaxResolutionMCS")),
+    fMinResolutionMCSChi2(pset.get<double>("MinResolutionMCSChi2")),
+    fMaxResolutionMCSChi2(pset.get<double>("MaxResolutionMCSChi2")),
+    fMinResolutionMCSLLHD(pset.get<double>("MinResolutionMCSLLHD")),
+    fMaxResolutionMCSLLHD(pset.get<double>("MaxResolutionMCSLLHD")),
+    fMCSAngleMethod(pset.get<int>("MCSAngleMethod")),
     fRecombFactor(pset.get<double>("RecombFactor")),
     fTrackLabel(trackLabel),
     fShowerLabel(showerLabel),
@@ -349,17 +353,11 @@ double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByRange(const art:
 
 double NeutrinoEnergyRecoAlg::CalculateUncorrectedMuonMomentumByMCS(const art::Ptr<recob::Track> &pMuonTrack)
 {
-    trkf::TrackMomentumCalculator TrackMomCalc(fMinTrackLengthMCS,fMaxTrackLengthMCS, fSegmentSizeMCS);
+    trkf::TrackMomentumCalculator TrackMomCalc(fMinTrackLengthMCS,fMaxTrackLengthMCS, fSegmentSizeMCS, fMCSAngleMethod, fNStepsChi2);
     if (fMCSMethod == "Chi2")
-    {
-        std::cout << "reschi2: ";
-        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, true, fMaxMomentumMCS));
-    }
+        return (TrackMomCalc.GetMomentumMultiScatterChi2(pMuonTrack, true, fMaxMomentumMCS, fMinResolutionMCSChi2, fMaxResolutionMCSChi2));
     else if (fMCSMethod == "LLHD")
-    {
-        std::cout << "resllhd: ";
-        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, true, fMaxMomentumMCS, fStepsMomentumMCS, fMaxResolutionMCS, fTree));
-    }
+        return (TrackMomCalc.GetMomentumMultiScatterLLHD(pMuonTrack, true, fMaxMomentumMCS, fMinResolutionMCSLLHD, fMaxResolutionMCSLLHD, fTree));
     else
     {
         mf::LogWarning("NeutrinoEnergyRecoAlg") << " Method " << fMCSMethod << " not found. Use `Chi2` or `LLHD` for MCS. Using `Chi2` for now." << std::endl;
