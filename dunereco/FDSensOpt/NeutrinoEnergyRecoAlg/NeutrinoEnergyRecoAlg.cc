@@ -79,7 +79,7 @@ NeutrinoEnergyRecoAlg::NeutrinoEnergyRecoAlg(fhicl::ParameterSet const& pset, co
     fTree->Branch("azy", &bazy);
     fTree->Branch("ei", &bei);
     fTree->Branch("ej", &bej);
-    fTree->Branch("p", &fLepE);
+    fTree->Branch("E", &fLepE);
     fTree->Branch("len", &blen);
 
 }
